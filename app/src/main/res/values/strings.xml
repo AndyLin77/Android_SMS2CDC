@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">防疫實聯制</string>
+
+    <string name="tab_item_1">新增</string>
+    <string name="tab_item_2">編輯</string>
+
+    <string name="tv_PlaceName">場所名稱:</string>
+    <string name="tv_ScanMsg">請掃描場所的1922 QRCode</string>
+
+    <string name="btn_ScanQRCode">取得場所代碼</string>
+    <string name="btn_SavePlace">儲存</string>
+    <string name="btn_CancelPlace">取消</string>
+
+    <string name="scan_err_null">Error: Scan Content null</string>
+</resources>

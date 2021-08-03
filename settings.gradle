@@ -1,0 +1,2 @@
+rootProject.name = "SMS2CDC"
+include ':app'
