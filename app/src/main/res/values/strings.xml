@@ -5,7 +5,7 @@
     <string name="tab_item_2">系統</string>
 
     <string name="tv_PlaceName">場所名稱:</string>
-    <string name="tv_ScanMsg">請掃描場所的1922 QRCode</string>
+    <string name="tv_ScanMsg">請掃描1922的場所QRCode</string>
 
     <string name="btn_ScanQRCode">取得場所代碼</string>
     <string name="btn_SavePlace">儲存</string>

@@ -44,7 +44,7 @@ class PlaceEditActivity : AppCompatActivity() {
         getPlaceStrButton!!.setOnClickListener {
             var scanner = IntentIntegrator(this)
             scanner.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-            //scanner.setPrompt(getString(R.string.tv_ScanMsg))
+            scanner.setPrompt(getString(R.string.tv_ScanMsg))
             scanner.setCameraId(0)
             scanner.setBeepEnabled(false)
             scanner.initiateScan()
