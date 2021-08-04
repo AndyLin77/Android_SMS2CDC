@@ -2,31 +2,37 @@ package andystudio.sms2cdc
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import andystudio.sms2cdc.Models.PlaceDBHelper
 import com.google.zxing.integration.android.IntentIntegrator
 
-class NewPlace : AppCompatActivity() {
+class PlaceEditActivity : AppCompatActivity() {
 
     private lateinit var dbHelper: PlaceDBHelper
 
     var getPlaceStrButton: Button? = null
     var savePlaceStrButton: Button? = null
     var cancelEditButton: Button? = null
+    var deletePlaceButton: Button? = null
 
     var placeNameEditText: EditText? = null
     var placeStrEditText: EditText? = null
 
     val customizedRequestCode = 0x0000ffff
 
+    var placeNo: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_place)
+        setContentView(R.layout.activity_place_edit)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         // Get Database Instance
         dbHelper = PlaceDBHelper(this)
@@ -44,16 +50,31 @@ class NewPlace : AppCompatActivity() {
             scanner.initiateScan()
         }
 
+        // Save Button
         savePlaceStrButton = findViewById(R.id.btn_SavePlace)
         savePlaceStrButton!!.setOnClickListener {
             savePlaceData()
         }
 
+        // Delete Button
+        deletePlaceButton = findViewById(R.id.btn_DeletePlace)
+        deletePlaceButton!!.setBackgroundColor(Color.rgb(255, 55, 55))
+        deletePlaceButton!!.setOnClickListener {
+            deletePlace()
+        }
+
+        // Cancel Button
         cancelEditButton = findViewById(R.id.btn_CancelEdit)
         cancelEditButton!!.setOnClickListener {
             cancelSavePlace()
         }
 
+        intent?.extras?.let {
+            placeNo = it.getString("placeNo").toString()
+            placeNameEditText!!.setText(it.getString("placeName"))
+            placeStrEditText!!.setText("只得修改場所名稱")
+            placeStrEditText!!.isEnabled = false
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -97,7 +118,12 @@ class NewPlace : AppCompatActivity() {
         }
 
         try {
-            dbHelper.addPlaceDetail(placeName.toString(), smsMsg.toString(), 0.0, 0.0)
+            if (placeNo.isNullOrEmpty()) {
+                dbHelper.addPlaceDetail(placeName.toString(), smsMsg.toString(), 0.0, 0.0)
+            } else {
+                dbHelper.updatePlaceDetail(placeNo.toInt(), placeName.toString())
+            }
+
             placeNameEditText!!.text = null
             placeStrEditText!!.text = null
             setResult(Activity.RESULT_OK)
@@ -106,6 +132,19 @@ class NewPlace : AppCompatActivity() {
         } catch (ex: Exception) {
             Toast.makeText(this, "新增失敗", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun deletePlace() {
+        if (!placeNo.isNullOrEmpty()) {
+            dbHelper.deletePlaceDetail(placeNo.toInt())
+            placeNameEditText!!.text = null
+            placeStrEditText!!.text = null
+            setResult(Activity.RESULT_OK)
+            finish()
+        } else {
+            Toast.makeText(this, "請選擇欲刪除的地點", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     fun cancelSavePlace() {

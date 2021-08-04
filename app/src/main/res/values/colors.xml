@@ -11,6 +11,7 @@
 
     <color name="colorPrimary">#69B9FF</color>
     <color name="colorPrimaryDark">#78AAAA</color>
+    <color name="DeleteRed">#FF3737</color>
 </resources>
 
     <!--<resources xmlns:tools="http://schemas.android.com/tools">-->

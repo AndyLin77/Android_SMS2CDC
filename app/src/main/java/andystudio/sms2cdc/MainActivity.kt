@@ -7,19 +7,23 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import andystudio.sms2cdc.Models.Place
 import andystudio.sms2cdc.Models.PlaceAdapter
+import andystudio.sms2cdc.Models.PlaceDBHelper
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var placeList = ArrayList<Place>()
     private lateinit var placeAdapter: PlaceAdapter
+    private var placeList = ArrayList<Place>()
+
     private lateinit var dbHelper: PlaceDBHelper
 
-    var placeListView: ListView? = null
+    //var placeListView: ListView? = null
+    var placeListRecyclerView: RecyclerView? = null
 
     var addPlaceActivityCode: Int = 1001
 
@@ -27,24 +31,43 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        placeListView = findViewById(R.id.placeListView)
-        placeListView!!.setOnItemClickListener { parent, _, position, _ ->
-            val selectedItem = parent.getItemAtPosition(position) as Place
-            sendSMSUsingNativeSMSComposer(selectedItem.PlaceStr)
-        }
-
         dbHelper = PlaceDBHelper(this)
-        getPlaceList()
+        placeListRecyclerView = findViewById(R.id.recyclerView)
+        placeList = dbHelper.getPlaceDetailData()
+
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        placeListRecyclerView!!.layoutManager = linearLayoutManager
+
+        placeAdapter = PlaceAdapter(placeList, this, this)
+        placeListRecyclerView!!.adapter = placeAdapter
+
+
+
+//        placeListView = findViewById(R.id.placeListView)
+//        placeListView!!.setOnItemClickListener { parent, _, position, _ ->
+//            val selectedItem = parent.getItemAtPosition(position) as Place
+//            sendSMSUsingNativeSMSComposer(selectedItem.PlaceStr)
+//        }
+
+        //getPlaceList()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == addPlaceActivityCode && resultCode == Activity.RESULT_OK) {
-            placeList = dbHelper.getPlaceDetailData()
-            placeAdapter = PlaceAdapter(R.layout.placelistlayout, placeList)
-            placeListView?.adapter = placeAdapter
-            placeListView!!.invalidateViews()
-        }
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == addPlaceActivityCode && resultCode == Activity.RESULT_OK) {
+            placeList = dbHelper.getPlaceDetailData()
+            placeAdapter = PlaceAdapter(placeList, this, this)
+            placeListRecyclerView!!.adapter = placeAdapter
+            placeAdapter.notifyDataSetChanged()
+        }
+//        if(requestCode == addPlaceActivityCode && resultCode == Activity.RESULT_OK) {
+//            placeList = dbHelper.getPlaceDetailData()
+//            placeAdapter = PlaceAdapter(R.layout.placelistlayout, placeList)
+//            placeListView?.adapter = placeAdapter
+//            placeListView!!.invalidateViews()
+//        }
+//        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -56,12 +79,12 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.newItem -> {
-                startActivityForResult(Intent(this, NewPlace::class.java), addPlaceActivityCode)
+                startActivityForResult(Intent(this, PlaceEditActivity::class.java), addPlaceActivityCode)
             }
 
-//            R.id.editItem -> {
-//                startActivity(Intent(this, ImageListActivity::class.java))
-//            }
+            R.id.sysItem -> {
+                startActivity(Intent(this, SystemActivity::class.java))
+            }
 
         }
         return super.onOptionsItemSelected(item)
@@ -79,9 +102,9 @@ class MainActivity : AppCompatActivity() {
     fun getPlaceList() {
 
         //placeList.add(Place(1, "台鐵-松竹車站", "場所代碼：177289824657848 本次實聯簡訊限防疫目的使用。"))
-        placeList = dbHelper.getPlaceDetailData()
-        placeAdapter = PlaceAdapter(R.layout.placelistlayout, placeList)
-        placeListView?.adapter = placeAdapter
+        //placeList = dbHelper.getPlaceDetailData()
+        //placeAdapter = PlaceAdapter(R.layout.placelistlayout, placeList)
+        //placeListView?.adapter = placeAdapter
     }
 
     fun sendSMSUsingNativeSMSComposer(smsStr: String) {

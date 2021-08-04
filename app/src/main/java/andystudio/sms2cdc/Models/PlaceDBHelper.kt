@@ -1,10 +1,9 @@
-package andystudio.sms2cdc
+package andystudio.sms2cdc.Models
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import andystudio.sms2cdc.Models.Place
 
 class PlaceDBHelper (context: Context) :SQLiteOpenHelper(context, database, null, ver) {
     companion object {
@@ -19,8 +18,14 @@ class PlaceDBHelper (context: Context) :SQLiteOpenHelper(context, database, null
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("DROP TABLE IF EXISTS $tableName")
-        onCreate(db)
+        //db?.execSQL("DROP TABLE IF EXISTS $tableName")
+        //onCreate(db)
+    }
+
+    fun updatePlaceDetail(placeNo: Int, placeName: String) {
+        val values = ContentValues()
+        values.put("PlaceName", placeName)
+        writableDatabase.update("$tableName", values, "PlaceNo = $placeNo", null)
     }
 
     fun addPlaceDetail(placeName: String, placeStr: String, latitude: Double, longitude: Double) {
@@ -30,6 +35,10 @@ class PlaceDBHelper (context: Context) :SQLiteOpenHelper(context, database, null
         values.put("Latitude", latitude)
         values.put("Longitude", longitude)
         writableDatabase.insert("$tableName", null, values)
+    }
+
+    fun deletePlaceDetail(placeNo: Int) {
+        writableDatabase.delete("$tableName", "PlaceNo = $placeNo", null)
     }
 
     fun getPlaceDetailData(): ArrayList<Place> {
