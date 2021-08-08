@@ -2,7 +2,6 @@ package andystudio.sms2cdc
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
@@ -107,11 +106,11 @@ class MainActivity : AppCompatActivity() {
         //placeListView?.adapter = placeAdapter
     }
 
-    fun sendSMSUsingNativeSMSComposer(smsStr: String) {
-        val uri = Uri.parse("smsto:1922")
-        val intent = Intent(Intent.ACTION_SENDTO, uri)
-        intent.putExtra("sms_body", smsStr)
-        startActivity(intent)
-    }
+//    fun sendSMSUsingNativeSMSComposer(smsStr: String) {
+//        val uri = Uri.parse("smsto:1922")
+//        val intent = Intent(Intent.ACTION_SENDTO, uri)
+//        intent.putExtra("sms_body", smsStr)
+//        startActivity(intent)
+//    }
 }
 

@@ -1,14 +1,17 @@
 package andystudio.sms2cdc
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import andystudio.sms2cdc.Models.PlaceDBHelper
 import com.google.zxing.integration.android.IntentIntegrator
 
@@ -17,6 +20,7 @@ class PlaceEditActivity : AppCompatActivity() {
     private lateinit var dbHelper: PlaceDBHelper
 
     var getPlaceStrButton: Button? = null
+    var sendSMSButton: Button? = null
     var savePlaceStrButton: Button? = null
     var cancelEditButton: Button? = null
     var deletePlaceButton: Button? = null
@@ -50,6 +54,17 @@ class PlaceEditActivity : AppCompatActivity() {
             scanner.initiateScan()
         }
 
+        sendSMSButton = findViewById(R.id.btn_SendSMS)
+        sendSMSButton!!.setBackgroundColor(Color.rgb(125, 255, 110))
+        sendSMSButton!!.setOnClickListener {
+            var smsMsg = placeStrEditText!!.text
+            if (smsMsg.isNullOrEmpty()) {
+                Toast.makeText(this, "請先掃描或輸入場所代碼", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            sendSMSUsingNativeSMSComposer(smsMsg.toString())
+        }
+
         // Save Button
         savePlaceStrButton = findViewById(R.id.btn_SavePlace)
         savePlaceStrButton!!.setOnClickListener {
@@ -77,6 +92,13 @@ class PlaceEditActivity : AppCompatActivity() {
         }
     }
 
+    fun sendSMSUsingNativeSMSComposer(smsStr: String) {
+        val uri = Uri.parse("smsto:1922")
+        val intent = Intent(Intent.ACTION_SENDTO, uri)
+        intent.putExtra("sms_body", smsStr)
+        ContextCompat.startActivity(this, intent, null)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode != customizedRequestCode && requestCode != IntentIntegrator.REQUEST_CODE) {
             // This is important, otherwise the result will not be passed to the fragment
@@ -101,7 +123,17 @@ class PlaceEditActivity : AppCompatActivity() {
 
     fun setPlaceMessage(scannerStr: String) {
 
-        placeStrEditText!!.setText(scannerStr.substring(11, scannerStr.length))
+        var smsMsg = scannerStr.substring(11, scannerStr.length)
+        placeStrEditText!!.setText(smsMsg)
+
+        AlertDialog.Builder(this)
+            .setTitle("傳送訊息?")
+            .setMessage("是否需要發送場所代碼簡訊")
+            .setPositiveButton("傳送") { _, _ ->
+                sendSMSUsingNativeSMSComposer(smsMsg)
+            }
+            .setNeutralButton("取消", null)
+            .show()
 
         // smsto:1922:場所代碼：177289824657848 本次實聯簡訊限防疫目的使用。 // 松竹車站
         // smsto:1922:場所代碼：188393939883899 本次實聯簡訊限防疫目的使用。 // 大慶車站
